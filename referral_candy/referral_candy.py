@@ -3,10 +3,7 @@ import requests
 import time
 
 _DEFAULT_API_URL = 'https://my.referralcandy.com/api/v1/'
-_API_METHODS = {
-    'get' : ['verify', 'referrals', 'referrer', 'contacts'],
-    'post': ['purchase', 'referral', 'signup', 'invite']
-}
+
 
 class ReferralCandy:
     def __init__(self, access_id, secret_key):
@@ -22,15 +19,35 @@ class ReferralCandy:
         collected_params = ''.join(('%s=%s' % (k,v)) for k, v in sorted(params.items()))
         return hashlib.md5((self.secret_key + collected_params).encode()).hexdigest()
 
-def define_endpoint_fn(verb, ep):
-    def endpoint_fn(self, params=None):
-        if params is None:
-            params = {}
-        http_method_fn = getattr(requests, verb)
-        return http_method_fn("%s%s.json" % (_DEFAULT_API_URL, ep),
-                               params=self._add_signature_to(params))
-    setattr(ReferralCandy, ep, endpoint_fn)
+    def verify(self, params):
+        return requests.get("%sverify.json" % _DEFAULT_API_URL,
+                            params=self._add_signature_to(params))
 
-for verb, endpoints in _API_METHODS.items():
-    for ep in endpoints:
-        define_endpoint_fn(verb, ep)
+    def referrals(self, params):
+        return requests.get("%sreferrals.json" % _DEFAULT_API_URL,
+                            params=self._add_signature_to(params))
+
+    def referrer(self, params):
+        return requests.get("%sreferrer.json" % _DEFAULT_API_URL,
+                            params=self._add_signature_to(params))
+
+    def contacts(self, params):
+        return requests.get("%scontacts.json" % _DEFAULT_API_URL,
+                            params=self._add_signature_to(params))
+
+    def purchase(self, params):
+        return requests.post("%spurchase.json" % _DEFAULT_API_URL,
+                             params=self._add_signature_to(params))
+
+    def referral(self, params):
+        return requests.post("%sreferral.json" % _DEFAULT_API_URL,
+                             params=self._add_signature_to(params))
+
+    def signup(self, params):
+        return requests.post("%ssignup.json" % _DEFAULT_API_URL,
+                             params=self._add_signature_to(params))
+
+    def invite(self, params):
+        return requests.post("%sinvite.json" % _DEFAULT_API_URL,
+                             params=self._add_signature_to(params))
+
